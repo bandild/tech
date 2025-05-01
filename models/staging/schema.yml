@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: public
+    database: FINANCIAL_DB
+    schema: PUBLIC
+    tables:
+      - name: STG_CUSTOMERS
+      - name: STG_ACCOUNTS
+      - name: STG_TRANSACTIONS
