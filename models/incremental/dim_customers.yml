@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: >
+      Incremental dimension table for customer profiles, deduplicated by latest update and enriched with derived fields like age and account age. Includes load tracking metadata for auditability.
+    columns:
+      - name: customer_id
+        description: Unique ID for each customer
+        tests:
+          - unique
+          - not_null
+
+      - name: first_name
+        description: Capitalized customer first name
+
+      - name: last_name
+        description: Capitalized customer last name
+
+      - name: email
+        description: Lowercased email address
+        tests:
+          - not_null
+
+      - name: phone
+        description: Cleaned numeric-only phone number
+
+      - name: dob
+        description: Customer's date of birth
+
+      - name: account_open_date
+        description: Date when account was opened
+
+      - name: age
+        description: "Derived field: customer's age in years"
+
+      - name: account_age_days
+        description: "Derived field: number of days since account opening"
+
+      - name: account_status
+        description: Standardized account status (ACTIVE/INACTIVE)
+        tests:
+          - accepted_values:
+              values: ['ACTIVE', 'INACTIVE']
+
+      - name: last_updated
+        description: Timestamp for last source update
+        tests:
+          - not_null
+
+      - name: load_timestamp
+        description: Timestamp when the row was loaded into the model
+        tests:
+          - not_null
+
+      - name: batch_id
+        description: Unique run ID assigned using DBT's invocation ID
