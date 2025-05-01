@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: stg_accounts_clean
+    description: Cleaned staging data for accounts
+    columns:
+      - name: account_id
+        description: Unique ID for each account
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: Foreign key to customer
+        tests:
+          - not_null
+
+      - name: balance
+        description: Account balance amount
+        tests:
+          - not_null

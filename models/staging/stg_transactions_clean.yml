@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: stg_transactions_clean
+    description: Cleaned staging data for transactions
+    columns:
+      - name: transaction_id
+        description: Unique transaction ID
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: ID of the customer who made the transaction
+        tests:
+          - not_null
+
+      - name: amount
+        description: Transaction amount (must be non-null and >= 0)
+        tests:
+          - not_null

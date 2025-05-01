@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: stg_customers_clean
+    description: Cleaned staging data for customers
+    columns:
+      - name: customer_id
+        description: Unique ID for each customer
+        tests:
+          - unique
+          - not_null
+
+      - name: email
+        description: Customer's email address
+        tests:
+          - not_null
+
+      - name: phone_cleaned
+        description: Cleaned and numeric-only phone number
+        tests:
+          - not_null
+
+      - name: dob
+        description: Customer's date of birth
+        tests:
+          - not_null
+
+      - name: account_status
+        description: Status of the customer account
+        tests:
+          - accepted_values:
+              values: ['ACTIVE', 'INACTIVE']
+
+      - name: last_updated
+        description: Timestamp when the record was last updated
+        tests:
+          - not_null
