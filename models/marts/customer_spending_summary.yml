@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: customer_spending_summary
+    description: >
+      Summary star schema model providing transaction-level aggregation for each customer,
+      including spend totals, averages, and customer engagement metrics.
+
+    columns:
+      - name: customer_id
+        description: Unique customer ID
+        tests:
+          - not_null
+
+      - name: first_name
+        description: Customer's first name
+
+      - name: last_name
+        description: Customer's last name
+
+      - name: age
+        description: Age of the customer
+
+      - name: customer_status
+        description: Account status of the customer
+        tests:
+          - accepted_values:
+              values: ['ACTIVE', 'INACTIVE']
+
+      - name: account_age_days
+        description: Number of days since customer opened their account
+
+      - name: total_transactions
+        description: Total number of transactions by the customer
+
+      - name: total_spent
+        description: Total amount spent by the customer
+
+      - name: avg_transaction_value
+        description: Average transaction value
+
+      - name: max_transaction_value
+        description: Maximum value of a transaction
+
+      - name: min_transaction_value
+        description: Minimum value of a transaction
+
+      - name: unique_merchants
+        description: Number of unique merchants the customer transacted with
+
+      - name: unique_categories
+        description: Number of unique transaction categories
+
+      - name: last_transaction_date
+        description: Date of the most recent transaction
+
+      - name: snapshot_date
+        description: Date of the snapshot/report generation
