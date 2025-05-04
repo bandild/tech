@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: fact_transactions
+    description: >
+      Fact table containing customer transactions enriched with transaction attributes,
+      flags for anomaly detection, and time-based aggregations.
+
+    columns:
+      - name: transaction_id
+        description: Unique identifier for the transaction
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: Foreign key to the dim_customers table
+        tests:
+          - not_null
+
+      - name: transaction_date
+        description: Date when the transaction occurred
+
+      - name: amount
+        description: Transaction amount in USD
+        tests:
+          - not_null
+
+      - name: merchant
+        description: Name of the merchant (normalized)
+
+      - name: category
+        description: Transaction category (e.g., Groceries, Entertainment)
+
+      - name: transaction_type
+        description: Indicates if it’s a Credit or Debit transaction
+        tests:
+          - accepted_values:
+              values: ['CREDIT', 'DEBIT']
+
+      - name: transaction_status
+        description: Indicates if the transaction was completed or failed
+        tests:
+          - accepted_values:
+              values: ['COMPLETED', 'FAILED']
+
+      - name: is_negative_amount
+        description: Flag if amount is negative (possible data issue or reversal)
+
+      - name: is_high_value_txn
+        description: Flag for transactions with amount > $1000
+
+      - name: transaction_week
+        description: Week of the transaction (used for reporting)
+
+      - name: transaction_month
+        description: Month of the transaction (used for analysis)
+
+      - name: last_updated
+        description: Timestamp of the most recent update from source
+        tests:
+          - not_null
+
+      - name: load_timestamp
+        description: Timestamp when the record was loaded into the warehouse
+        tests:
+          - not_null
+
+      - name: batch_id
+        description: DBT-generated batch ID to track job run

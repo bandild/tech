@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: dim_accounts
+    description: >
+      Dimension table for customer accounts, enriched with calculated fields like account age,
+      days since last transaction, and balance segmentation.
+    columns:
+      - name: account_id
+        description: Primary key for the account
+        tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        description: Foreign key to dim_customers
+        tests:
+          - not_null
+
+      - name: account_type
+        description: Type of account (e.g., Checking, Savings)
+
+      - name: balance
+        description: Current account balance
+        tests:
+          - not_null
+
+      - name: last_transaction_date
+        description: Most recent transaction date for the account
+
+      - name: account_status
+        description: Status of the account (ACTIVE/INACTIVE)
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['ACTIVE', 'INACTIVE']
+
+      
+
+      - name: days_since_last_txn
+        description: Days since the last transaction
+
+      - name: balance_segment
+        description: Categorized balance band
+        tests:
+          - accepted_values:
+              values: ['NEGATIVE', 'LOW', 'MEDIUM', 'HIGH']
+
+      - name: last_updated
+        description: Timestamp of last update in the source
+        tests:
+          - not_null
+
+      - name: load_timestamp
+        description: When the record was loaded into the warehouse
+        tests:
+          - not_null
+
+      - name: batch_id
+        description: Unique batch identifier from dbt invocation
