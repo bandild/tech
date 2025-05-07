@@ -1,3 +1,4 @@
+
 {{ config(
     materialized='view',
     alias='star_category_trends'
