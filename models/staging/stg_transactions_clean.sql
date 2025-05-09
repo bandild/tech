@@ -1,16 +1,26 @@
+WITH ranked AS (
+  SELECT *,
+         ROW_NUMBER() OVER (
+           PARTITION BY transaction_id
+           ORDER BY last_updated DESC
+         ) AS rn
+  FROM {{ source('public', 'STG_TRANSACTIONS') }}
+  WHERE
+    transaction_id IS NOT NULL
+    AND customer_id IS NOT NULL
+    AND amount >= 0
+    AND TRIM(UPPER(transaction_status)) IN ('COMPLETED', 'FAILED')
+)
+
 SELECT
-  TRANSACTION_ID,
-  CUSTOMER_ID,
-  TRANSACTION_DATE,
-  AMOUNT,
-  MERCHANT,
-  CATEGORY,
-  TRANSACTION_TYPE,
-  TRIM(UPPER(TRANSACTION_STATUS)) AS TRANSACTION_STATUS,
-  LAST_UPDATED
-FROM {{ source('public', 'STG_TRANSACTIONS') }}
-WHERE
-  TRANSACTION_ID IS NOT NULL
-  AND CUSTOMER_ID IS NOT NULL
-  AND AMOUNT >= 0
-  AND TRIM(UPPER(TRANSACTION_STATUS)) IN ('COMPLETED', 'FAILED')
+  transaction_id,
+  customer_id,
+  transaction_date,
+  amount,
+  merchant,
+  category,
+  transaction_type,
+  TRIM(UPPER(transaction_status)) AS transaction_status,
+  last_updated
+FROM ranked
+WHERE rn = 1
