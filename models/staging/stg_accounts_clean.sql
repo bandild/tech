@@ -1,16 +1,26 @@
+WITH ranked AS (
+  SELECT *,
+         ROW_NUMBER() OVER (
+           PARTITION BY account_id
+           ORDER BY last_updated DESC
+         ) AS rn
+  FROM {{ source('public', 'STG_ACCOUNTS') }}
+  WHERE
+    account_id IS NOT NULL
+    AND customer_id IS NOT NULL
+    AND TRIM(UPPER(account_type)) IN ('CHECKING', 'SAVINGS')
+    AND balance >= 0
+    AND last_transaction_date IS NOT NULL
+    AND TRIM(UPPER(account_status)) IN ('ACTIVE', 'INACTIVE')
+)
+
 SELECT
-  ACCOUNT_ID,
-  CUSTOMER_ID,
-  TRIM(UPPER(ACCOUNT_TYPE)) AS ACCOUNT_TYPE,
-  ROUND(BALANCE, 2) AS BALANCE,
-  LAST_TRANSACTION_DATE,
-  TRIM(UPPER(ACCOUNT_STATUS)) AS ACCOUNT_STATUS,
-  LAST_UPDATED
-FROM {{ source('public', 'STG_ACCOUNTS') }}
-WHERE
-  ACCOUNT_ID IS NOT NULL
-  AND CUSTOMER_ID IS NOT NULL
-  AND TRIM(UPPER(ACCOUNT_TYPE)) IN ('CHECKING', 'SAVINGS')
-  AND BALANCE >= 0
-  AND LAST_TRANSACTION_DATE IS NOT NULL
-  AND TRIM(UPPER(ACCOUNT_STATUS)) IN ('ACTIVE', 'INACTIVE')
+  account_id,
+  customer_id,
+  TRIM(UPPER(account_type)) AS account_type,
+  ROUND(balance, 2) AS balance,
+  last_transaction_date,
+  TRIM(UPPER(account_status)) AS account_status,
+  last_updated
+FROM ranked
+WHERE rn = 1
