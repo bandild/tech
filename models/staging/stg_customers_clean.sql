@@ -1,19 +1,30 @@
+WITH ranked AS (
+  SELECT *,
+         REGEXP_REPLACE(phone, '[^0-9]', '') AS phone_cleaned,
+         ROW_NUMBER() OVER (
+           PARTITION BY customer_id
+           ORDER BY last_updated DESC
+         ) AS rn
+  FROM {{ source('public', 'STG_CUSTOMERS') }}
+  WHERE
+    customer_id IS NOT NULL
+    AND first_name IS NOT NULL
+    AND last_name IS NOT NULL
+    AND email IS NOT NULL
+    AND dob IS NOT NULL
+    AND LENGTH(REGEXP_REPLACE(phone, '[^0-9]', '')) BETWEEN 10 AND 12
+    AND TRIM(UPPER(account_status)) IN ('ACTIVE', 'INACTIVE')
+)
+
 SELECT
-  CUSTOMER_ID,
-  INITCAP(FIRST_NAME) AS FIRST_NAME,
-  INITCAP(LAST_NAME) AS LAST_NAME,
-  LOWER(EMAIL) AS EMAIL,
-  REGEXP_REPLACE(PHONE, '[^0-9]', '') AS PHONE_CLEANED,
-  DOB,
-  ACCOUNT_OPEN_DATE,
-  TRIM(UPPER(ACCOUNT_STATUS)) AS ACCOUNT_STATUS,
-  LAST_UPDATED
-FROM {{ source('public', 'STG_CUSTOMERS') }}
-WHERE
-  CUSTOMER_ID IS NOT NULL
-  AND FIRST_NAME IS NOT NULL
-  AND LAST_NAME IS NOT NULL
-  AND EMAIL IS NOT NULL
-  AND DOB IS NOT NULL
-  AND LENGTH(REGEXP_REPLACE(PHONE, '[^0-9]', '')) BETWEEN 10 AND 12
-  AND TRIM(UPPER(ACCOUNT_STATUS)) IN ('ACTIVE', 'INACTIVE')
+  customer_id,
+  INITCAP(first_name) AS first_name,
+  INITCAP(last_name) AS last_name,
+  LOWER(email) AS email,
+  phone_cleaned,
+  dob,
+  account_open_date,
+  TRIM(UPPER(account_status)) AS account_status,
+  last_updated
+FROM ranked
+WHERE rn = 1
